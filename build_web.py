@@ -136,13 +136,23 @@ button.ghost:hover{border-color:var(--blu);color:var(--blu)}
 .qtitle{font-size:15.5px;margin:2px 0 8px}
 .qopts{display:flex;flex-direction:column;gap:6px}
 .opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--bd);border-radius:8px;padding:7px 10px;cursor:pointer;background:#fff}
+.opt::before{content:"";flex:0 0 auto;width:15px;height:15px;margin-top:4px;border:2px solid #b9c0d4;border-radius:50%;background:#fff;box-sizing:border-box}
+.opt.opt-multi::before{border-radius:4px}
 .opt:hover{border-color:#b9c6e8}
 .opt .L{font-weight:700;color:#3c4257}
-.opt.sel{border-color:var(--blu);background:#eef4ff}
+.opt.sel{border-color:var(--blu);background:#e3edff;box-shadow:inset 0 0 0 1px var(--blu)}
+.opt.sel .L{color:var(--blu)}
+.opt.sel::before{border-color:var(--blu);background:radial-gradient(circle at center,var(--blu) 0 3px,transparent 3.5px)}
+.opt.opt-multi.sel::before{content:"✓";background:var(--blu);border-color:var(--blu);color:#fff;font-size:11px;line-height:12px;text-align:center}
 .opt.ok{border-color:var(--grn);background:#ecf9f1}
 .opt.ok .L{color:var(--grn)}
+.opt.ok::before{border-color:var(--grn)}
+.opt.ok.sel::before{background:radial-gradient(circle at center,var(--grn) 0 3px,transparent 3.5px)}
+.opt.ok:not(.sel)::before{content:"✓";border-color:var(--grn);color:var(--grn);font-size:11px;line-height:12px;text-align:center}
 .opt.no{border-color:#eeb9b7;background:#fdf1f0}
 .opt.no .L{color:var(--red)}
+.opt.no::before{border-color:var(--red)}
+.opt.no.sel::before{background:radial-gradient(circle at center,var(--red) 0 3px,transparent 3.5px)}
 .qans{margin-top:9px;border-left:3px solid var(--grn);background:#f2fbf5;padding:6px 12px;border-radius:0 6px 6px 0;font-size:14px}
 .qans b{color:var(--grn)}
 .qana{margin-top:6px;border-left:3px solid #c9cfdd;background:#f6f7fb;padding:6px 12px;border-radius:0 6px 6px 0;font-size:13.5px;color:#4a5068}
@@ -310,7 +320,7 @@ function renderList(container, instances, opts){
       const wrap = el("div", "qopts");
       state.optOrder.get(inst.key).forEach((oi, pos) => {
         const o = q.opts[oi];
-        const opt = el("div", "opt", '<span class="L">' + LET[pos] + '.</span><span>' + esc(o.t) + "</span>");
+        const opt = el("div", "opt" + (q.type === 2 ? " opt-multi" : ""), '<span class="L">' + LET[pos] + '.</span><span>' + esc(o.t) + "</span>");
         opt.dataset.oi = oi;
         if (ans.sel.has(oi)) opt.classList.add("sel");
         wrap.appendChild(opt);
@@ -333,6 +343,7 @@ function paint(card, inst){
   card.querySelectorAll(".opt").forEach(opt => {
     const oi = +opt.dataset.oi;
     opt.classList.remove("ok", "no");
+    opt.classList.toggle("sel", ans.sel.has(oi));
     if (shown) {
       if (q.opts[oi].a) opt.classList.add("ok");
       else if (ans.sel.has(oi)) opt.classList.add("no");
