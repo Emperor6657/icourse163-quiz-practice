@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>内燃机学 · 题库练习</title>
+<style>
+:root{--bd:#e3e6ee;--mut:#8a90a3;--blu:#2f6fed;--grn:#1e9e55;--red:#d64541;--bg:#f4f6fb}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:#262b3a}
+header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:10px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}
+nav{display:flex;gap:6px}
+nav button{border:1px solid var(--bd);background:#f8f9fd;border-radius:8px;padding:7px 16px;cursor:pointer;font-size:14px}
+nav button.active{background:var(--blu);border-color:var(--blu);color:#fff}
+main{max-width:960px;margin:18px auto;padding:0 14px 60px}
+.panel{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:6px}
+.controls label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:14px;color:#3c4257}
+.controls select,.controls input[type=number],.controls input[type=text]{border:1px solid var(--bd);border-radius:6px;padding:5px 8px;font-size:14px;background:#fff}
+.controls .num{width:64px}
+button.act{border:0;border-radius:8px;padding:8px 18px;cursor:pointer;background:var(--blu);color:#fff;font-size:14px}
+button.ghost{border:1px solid var(--bd);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;color:#3c4257}
+button.ghost:hover{border-color:var(--blu);color:var(--blu)}
+.stat{font-size:13px;color:var(--mut);margin-left:auto}
+.qcard{border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin:12px 0;background:#fdfdff}
+.qcard.right{border-color:#bfe4cd;background:#f7fcf9}
+.qcard.wrong{border-color:#f0c9c7;background:#fdf7f6}
+.qhead{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;color:var(--mut)}
+.qno{font-weight:700;color:#262b3a;font-size:15px}
+.badge{border-radius:5px;padding:1px 8px;font-size:12px;color:#fff}
+.t1{background:#5b8def}.t2{background:#9a6ee8}.t3{background:#e0993f}.t4{background:#4cb0a5}
+.verdict{margin-left:auto;font-weight:700}
+.verdict.ok{color:var(--grn)}.verdict.no{color:var(--red)}
+.qtitle{font-size:15.5px;margin:2px 0 8px}
+.qopts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--bd);border-radius:8px;padding:7px 10px;cursor:pointer;background:#fff}
+.opt:hover{border-color:#b9c6e8}
+.opt .L{font-weight:700;color:#3c4257}
+.opt.sel{border-color:var(--blu);background:#eef4ff}
+.opt.ok{border-color:var(--grn);background:#ecf9f1}
+.opt.ok .L{color:var(--grn)}
+.opt.no{border-color:#eeb9b7;background:#fdf1f0}
+.opt.no .L{color:var(--red)}
+.qans{margin-top:9px;border-left:3px solid var(--grn);background:#f2fbf5;padding:6px 12px;border-radius:0 6px 6px 0;font-size:14px}
+.qans b{color:var(--grn)}
+.qana{margin-top:6px;border-left:3px solid #c9cfdd;background:#f6f7fb;padding:6px 12px;border-radius:0 6px 6px 0;font-size:13.5px;color:#4a5068}
+.fillrow{display:flex;gap:8px;align-items:center;margin-top:4px}
+.fillrow input{flex:1;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:15px}
+.exambar{display:flex;gap:14px;align-items:center;background:#fff8ec;border:1px solid #f0dfc0;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:14px;flex-wrap:wrap}
+#ex-timer{font-weight:700;color:#b0650a;font-variant-numeric:tabular-nums}
+.summary{border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-top:12px;background:#fbfcff}
+.summary h3{margin:2px 0 8px;font-size:16px}
+.summary .row{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;align-items:center}
+.summary .big{font-size:30px;font-weight:800;color:var(--blu)}
+.hint{font-size:12.5px;color:var(--mut)}
+@media print{header nav,.controls button,.reveal-btn{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>内燃机学 · 题库练习</h1>
+  <nav>
+    <button data-mode="chapter" class="active">章节练习</button>
+    <button data-mode="random">随机抽题</button>
+    <button data-mode="exam">抽题组卷</button>
+  </nav>
+</header>
+<main>
+
+<section id="panel-chapter">
+  <div class="panel">
+    <div class="controls">
+      <label>章节 <select id="ch-chapter"></select></label>
+      <label><input type="checkbox" id="ch-shuffle"> 打乱题目顺序</label>
+      <label><input type="checkbox" id="ch-shuffleopts"> 打乱选项顺序</label>
+      <label><input type="checkbox" id="ch-instant"> 即时判分</label>
+      <button class="ghost" id="ch-showall">显示全部答案</button>
+      <button class="ghost" id="ch-reset">重置作答</button>
+      <span class="stat" id="ch-stat"></span>
+    </div>
+    <div class="hint">选择答案后点“显示答案”核对；勾选“即时判分”则作答后立即显示对错。</div>
+  </div>
+  <div id="ch-list"></div>
+</section>
+
+<section id="panel-random" hidden>
+  <div class="panel">
+    <div class="controls">
+      <label>章节 <select id="rd-chapter"></select></label>
+      <span>题型</span>
+      <label><input type="checkbox" class="rd-type" value="1" checked>单选</label>
+      <label><input type="checkbox" class="rd-type" value="2">多选</label>
+      <label><input type="checkbox" class="rd-type" value="4" checked>判断</label>
+      <label><input type="checkbox" class="rd-type" value="3" checked>填空</label>
+      <label>数量 <input type="number" id="rd-count" class="num" value="10" min="1" max="271"></label>
+      <label><input type="checkbox" id="rd-shuffleopts"> 打乱选项顺序</label>
+      <label><input type="checkbox" id="rd-instant"> 即时判分</label>
+      <button class="act" id="rd-go">抽 题</button>
+      <button class="ghost" id="rd-showall">显示全部答案</button>
+      <span class="stat" id="rd-stat"></span>
+    </div>
+    <div class="hint">从所选范围中随机抽题（不重复），结果按 单选 → 判断 → 填空 分块排列，适合错题重练。</div>
+  </div>
+  <div id="rd-list"></div>
+</section>
+
+<section id="panel-exam" hidden>
+  <div class="panel">
+    <div class="controls" style="margin-bottom:2px">
+      <b>组卷设置</b>
+      <span class="hint">勾选章节，设置每章抽题数量，交卷前不显示对错</span>
+      <button class="ghost" id="ex-preset">模拟真实小测(5/5/5)</button>
+      <label><input type="checkbox" id="ex-shuffle" checked> 打乱题目顺序</label>
+      <label><input type="checkbox" id="ex-shuffleopts"> 打乱选项顺序</label>
+      <button class="act" id="ex-go">生成试卷</button>
+    </div>
+    <div class="controls" id="ex-chapters" style="margin-top:4px"></div>
+    <div class="controls">
+      <label>每章单选 <input type="number" class="num" id="ex-n1" value="5" min="0"></label>
+      <label>判断 <input type="number" class="num" id="ex-n4" value="5" min="0"></label>
+      <label>填空 <input type="number" class="num" id="ex-n3" value="5" min="0"></label>
+    </div>
+  </div>
+  <div id="ex-wrap" hidden>
+    <div class="exambar">
+      <b id="ex-name">试卷</b>
+      <span>用时 <span id="ex-timer">00:00</span></span>
+      <span id="ex-progress"></span>
+      <span style="margin-left:auto"><button class="act" id="ex-submit">交卷评分</button></span>
+    </div>
+    <div id="ex-list"></div>
+    <div id="ex-result"></div>
+  </div>
+</section>
+
+</main>
+<script>
+const BANK = [{"quizId":"1247059659","name":"第一章测验","no":1,"questions":[{"id":3367136067,"type":1,"score":2,"title":"以下不属于内燃机所特有的是（ ）","position":0,"opts":[{"t":"燃烧热能通过做功转化为动力","a":true},{"t":"工质燃烧后为燃烧产物","a":false},{"t":"燃料在机器内部燃烧","a":false},{"t":"工质燃烧前为燃料与空气混合气","a":false}]},{"id":3367136076,"type":1,"score":2,"title":"以下不属于内燃机的是（ ）","position":1,"opts":[{"t":"往复活塞式发动机","a":false},{"t":"蒸汽机","a":true},{"t":"自由活塞发动机","a":false},{"t":"燃气轮机","a":false}]},{"id":3367136077,"type":1,"score":2,"title":"柴油机进气行程吸入气缸的是（ ）","position":2,"opts":[{"t":"依工况而定","a":false},{"t":"燃料和空气的混合气","a":false},{"t":"燃料蒸汽","a":false},{"t":"空气","a":true}]},{"id":3367136078,"type":1,"score":2,"title":"以下无法从示功图获取的信息是（ ）","position":3,"opts":[{"t":"燃烧放热速率","a":false},{"t":"缸内压力升高率","a":false},{"t":"排放生成速率","a":true},{"t":"缸内压力曲线","a":false}]},{"id":3367136079,"type":1,"score":2,"title":"常规汽油机进气行程吸入气缸的是（ ）","position":4,"opts":[{"t":"燃料和空气的混合气","a":true},{"t":"依工况而定","a":false},{"t":"燃料蒸汽","a":false},{"t":"空气","a":false}]},{"id":3367136062,"type":1,"score":2,"title":"内燃机工作循环的净指示功为（ ）","position":19,"opts":[{"t":"动力过程功+理论泵气功","a":false},{"t":"动力过程功+实际泵气功","a":true},{"t":"泵气过程功","a":false},{"t":"动力过程功","a":false}]},{"id":3367136063,"type":1,"score":2,"title":"最早提出压燃式内燃机专利的是（ ）","position":20,"opts":[{"t":"卡尔本茨","a":false},{"t":"鲁道夫狄塞尔","a":true},{"t":"莱诺依尔","a":false},{"t":"奥托","a":false}]},{"id":3367136056,"type":1,"score":2,"title":"增压四冲程内燃机的实际泵气功（ ）","position":21,"opts":[{"t":"为正","a":false},{"t":"为负","a":false},{"t":"取决于内燃机工况","a":true},{"t":"为零","a":false}]},{"id":3367136059,"type":1,"score":2,"title":"内燃机工作循环的总指示功为（ ）","position":24,"opts":[{"t":"动力过程功+理论泵气功","a":true},{"t":"动力过程功+实际泵气功","a":false},{"t":"动力过程功","a":false},{"t":"泵气过程功","a":false}]},{"id":3367136072,"type":4,"score":2,"title":"由于柴油机的压缩比高于汽油机，因此压缩终了时的压力及燃烧后产生的气体压力一般都要比汽油机高。","position":5,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136073,"type":4,"score":2,"title":"柴油机由于压缩比高于汽油机，做功行程工质膨胀更彻底，因此做功终了时缸内压力和温度一般比汽油机低。","position":6,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136074,"type":4,"score":2,"title":"多缸内燃机各个气缸的总容积之和，称为内燃机排量。","position":7,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367136075,"type":4,"score":2,"title":"内燃机活塞的行程是曲柄旋转半径的两倍。","position":8,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136052,"type":4,"score":2,"title":"内燃机工作过程中缸内工质始终对活塞做正功。","position":9,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367136053,"type":4,"score":2,"title":"实际泵气功可正可负，但泵气损失功肯定为正。","position":10,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136057,"type":4,"score":2,"title":"柴油机压缩比大于汽油机，因此燃烧温度更高，排气温度也更高。","position":22,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367136058,"type":4,"score":2,"title":"增压内燃机的净指示功一般大于动力过程功，自然吸气内燃机的净指示功总是小于动力过程功。","position":23,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136054,"type":3,"score":2,"title":"热机是将燃料中的化学能转变为机械功的热力发动机，包括（ ）和外燃机。","position":11,"opts":[],"alt":["内燃机"]},{"id":3367136055,"type":3,"score":2,"title":"内燃机按缸内着火方式不同可以分为点燃式内燃机和（ ）内燃机。","position":12,"opts":[],"alt":["压燃式"]},{"id":3367136048,"type":3,"score":2,"title":"四冲程内燃机一个工作循环由进气、压缩、（ ）、排气四个冲程组成。","position":13,"opts":[],"alt":["做功","作功"]},{"id":3367136049,"type":3,"score":2,"title":"内燃机压缩与燃烧膨胀冲程所做功代数和称为（ ）。","position":14,"opts":[],"alt":["动力过程功"]},{"id":3367136050,"type":3,"score":2,"title":"内燃机进排气冲程所做功代数和称为（ ）。","position":15,"opts":[],"alt":["泵气过程功"]},{"id":3367136051,"type":3,"score":2,"title":"四冲程内燃机一个工作循环曲轴转两圈，活塞在气缸里往复行程（ ）次。","position":16,"opts":[],"alt":["两","2","二"]},{"id":3367136060,"type":3,"score":2,"title":"二冲程内燃机一个工作循环曲轴转一圈，活塞在气缸里往复行程（ ）次。","position":17,"opts":[],"alt":["一","1"]},{"id":3367136061,"type":3,"score":2,"title":"内燃机一个循环所有冲程功代数和称为（ ）。","position":18,"opts":[],"alt":["循环功"]}]},{"quizId":"1247056299","name":"第二章测验","no":2,"questions":[{"id":3367136036,"type":1,"score":2,"title":"以下内燃机性能指标中，哪个无有效与指示之分（ ）","position":0,"opts":[{"t":"热效率","a":false},{"t":"功率","a":false},{"t":"平均压力","a":false},{"t":"转速","a":true}]},{"id":3367136037,"type":1,"score":2,"title":"以下不属于内燃机的强化程度指标的是（ ）","position":1,"opts":[{"t":"升功率","a":false},{"t":"扭矩","a":true},{"t":"比体积","a":false},{"t":"比质量","a":false}]},{"id":3367136038,"type":1,"score":2,"title":"内燃机指示性能指标直接反映缸内热功转换的好坏，其以（ ）","position":2,"opts":[{"t":"工质对活塞所做的功为基础","a":true},{"t":"燃料释放的热能为基础","a":false},{"t":"燃料具有的化学能为基础","a":false},{"t":"曲轴有效输出功为基础","a":false}]},{"id":3367136039,"type":1,"score":2,"title":"内燃机有效性能指标直接反应内燃机实际工作性能的优劣，其以（ ）","position":3,"opts":[{"t":"工质对活塞所做的功为基础","a":false},{"t":"燃料具有的化学能为基础","a":false},{"t":"曲轴有效输出功为基础","a":true},{"t":"燃料释放的热能为基础","a":false}]},{"id":3367136032,"type":1,"score":2,"title":"以下不能表征内燃机动力性的参数是（ ）","position":4,"opts":[{"t":"扭矩","a":false},{"t":"有效燃油消耗率","a":true},{"t":"有效平均压力","a":false},{"t":"有效功率","a":false}]},{"id":3367136033,"type":1,"score":2,"title":"表征内燃机热力循环热功转换效率的性能指标是（ ）","position":5,"opts":[{"t":"燃烧效率","a":false},{"t":"机械效率","a":false},{"t":"有效热效率","a":false},{"t":"循环热效率","a":true}]},{"id":3367136043,"type":1,"score":2,"title":"以下不能表征内燃机经济性的参数是（ ）","position":15,"opts":[{"t":"指示燃油消耗率","a":false},{"t":"有效燃油消耗率","a":false},{"t":"有效效率","a":false},{"t":"指示平均压力","a":true}]},{"id":3367136020,"type":1,"score":2,"title":"表征内燃机指示功转化成有效功的能量转化效率指标是（ ）","position":16,"opts":[{"t":"燃烧效率","a":false},{"t":"有效热效率","a":false},{"t":"机械效率","a":true},{"t":"循环热效率","a":false}]},{"id":3367136034,"type":4,"score":2,"title":"对于某一内燃机，转矩和有效平均压力都反映了负荷的大小。","position":6,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136035,"type":4,"score":2,"title":"汽油机升功率比柴油机更大是因为其能够达到的最高转速更高。","position":7,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136044,"type":4,"score":2,"title":"四冲程自然吸气内燃机中汽油机的升功率要大于柴油机。","position":8,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136021,"type":4,"score":2,"title":"内燃机总指示功等于动力过程功加上理论泵气功。","position":17,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136022,"type":4,"score":2,"title":"内燃机转速和活塞平均运动速度是评定内燃机动力性能的速度指标。","position":18,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136023,"type":4,"score":2,"title":"燃料的低热值已经包含了燃烧产物水分的气化潜热。","position":19,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367136016,"type":4,"score":2,"title":"过量空气系数越大，混合气越稀，反之，混合气越浓。","position":20,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367136017,"type":4,"score":2,"title":"只有与做功有关的内燃机性能指标才有指示和有效之分。","position":21,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367136045,"type":3,"score":2,"title":"指示平均压力可以认为是一个假想不变的压力作用在活塞上，使活塞移动一个（ ）所做的功正好是指示功。","position":9,"opts":[],"alt":["冲程","行程"]},{"id":3367136046,"type":3,"score":2,"title":"每缸每循环吸入缸内的新鲜空气质量与按进气状态计算得到的理论充气质量的比值称为（ ）。","position":10,"opts":[],"alt":["充量系数","充气效率","容积效率"]},{"id":3367136047,"type":3,"score":2,"title":"内燃机单位气缸工作容积所做的有效功用（ ）表示。","position":11,"opts":[],"alt":["有效平均压力"]},{"id":3367136040,"type":3,"score":2,"title":"以每循环工质对活塞做功为计算基准的指标称为内燃机（ ）指标。","position":12,"opts":[],"alt":["指示性能"]},{"id":3367136041,"type":3,"score":2,"title":"以每循环曲轴有效输出功为计算基准的指标称为内燃机（ ）指标。","position":13,"opts":[],"alt":["有效性能"]},{"id":3367136042,"type":3,"score":2,"title":"衡量混合气浓度的参数主要有三个，包括（ ）、过量空气系数和燃空当量比。","position":14,"opts":[],"alt":["空燃比"]},{"id":3367136018,"type":3,"score":2,"title":"内燃机单位气缸工作容积所做的指示功用（ ）表示。","position":22,"opts":[],"alt":["指示平均压力"]},{"id":3367136019,"type":3,"score":2,"title":"内燃机有效性能指标以（ ）为计算基准。","position":23,"opts":[],"alt":["曲轴有效输出功"]}]},{"quizId":"1247061534","name":"第三章测验","no":3,"questions":[{"id":3367133944,"type":1,"score":2,"title":"我国汽油标号如93#代表汽油的（ ）","position":0,"opts":[{"t":"粘度","a":false},{"t":"MON","a":false},{"t":"RON","a":true},{"t":"馏出温度","a":false}]},{"id":3367133945,"type":1,"score":2,"title":"我国柴油标号如0#代表柴油的（ ）","position":1,"opts":[{"t":"十六烷值","a":false},{"t":"闪点","a":false},{"t":"饱和蒸汽压","a":false},{"t":"凝点","a":true}]},{"id":3367133946,"type":1,"score":2,"title":"当内燃机转速不变而负荷增加时，（ ）","position":2,"opts":[{"t":"汽油机φa增加，柴油机φa基本不变","a":false},{"t":"汽油机φa基本不变，柴油机φa增加","a":false},{"t":"汽油机φa减小，柴油机φa基本不变","a":false},{"t":"汽油机φa基本不变，柴油机φa减小","a":true}]},{"id":3367133947,"type":1,"score":2,"title":"下列内燃机代用燃料中，属于可再生能源的是（ ）","position":3,"opts":[{"t":"LPG","a":false},{"t":"LNG","a":false},{"t":"CNG","a":false},{"t":"BTL","a":true}]},{"id":3367133924,"type":1,"score":2,"title":"以下不属于汽油抗爆性提升常用添加剂的是（ ）","position":4,"opts":[{"t":"正庚烷","a":true},{"t":"二甲基叔丁基醚","a":false},{"t":"四乙基铅","a":false},{"t":"乙醇","a":false}]},{"id":3367133925,"type":1,"score":2,"title":"下列烃类燃料中，十六烷值由高到底排列正确的是（ ）","position":5,"opts":[{"t":"正烷烃>环烷烃/烯烃>芳香烃>α-甲基萘","a":true},{"t":"芳香烃>环烷烃/烯烃>正烷烃>α-甲基萘","a":false},{"t":"环烷烃/烯烃>正烷烃>芳香烃>α-甲基萘","a":false},{"t":"正烷烃>芳香烃>环烷烃/烯烃>α-甲基萘","a":false}]},{"id":3367133927,"type":1,"score":2,"title":"提高汽油机的压缩比，一般也要相应提高汽油的（ ）","position":7,"opts":[{"t":"辛烷值","a":true},{"t":"低热值","a":false},{"t":"十六烷值","a":false},{"t":"点火能量","a":false}]},{"id":3367133909,"type":1,"score":2,"title":"评价柴油和各种燃料自燃性的指标是（ ）","position":21,"opts":[{"t":"凝点","a":false},{"t":"十六烷值","a":true},{"t":"辛烷值","a":false},{"t":"馏程","a":false}]},{"id":3367133910,"type":1,"score":2,"title":"评价各种燃料抗爆性的指标是（ ）","position":22,"opts":[{"t":"凝点","a":false},{"t":"馏程","a":false},{"t":"十六烷值","a":false},{"t":"辛烷值","a":true}]},{"id":3367133911,"type":1,"score":2,"title":"以下反映各种燃料蒸发性的指标是（ ）","position":23,"opts":[{"t":"辛烷值","a":false},{"t":"馏程","a":true},{"t":"十六烷值","a":false},{"t":"凝点","a":false}]},{"id":3367133904,"type":1,"score":2,"title":"以下反映柴油和各种燃料低温流动性的指标是（ ）","position":24,"opts":[{"t":"辛烷值","a":false},{"t":"十六烷值","a":false},{"t":"馏程","a":false},{"t":"凝点","a":true}]},{"id":3367133920,"type":4,"score":2,"title":"燃料的H/C比越高，燃料的低热值越高，燃料越清洁。","position":8,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367133921,"type":4,"score":2,"title":"化学安定性越差的燃料，辛烷值越低。","position":9,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367133922,"type":4,"score":2,"title":"烃燃料C原子数越多，化学稳定性越差，但物态稳定性越好。","position":10,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367133923,"type":4,"score":2,"title":"工质的等熵指数越高，相同情况下热力循环热效率越高。","position":11,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367133905,"type":4,"score":2,"title":"相同C原子数的异烷烃比正烷烃化学稳定性更好，辛烷值更高。","position":25,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133906,"type":4,"score":2,"title":"含氧燃料热值比较低，但燃烧所需空气量少，混合气热值不一定低。","position":26,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133907,"type":4,"score":2,"title":"只要燃烧速度控制好，汽油机也可以实现均质混合气压燃。","position":27,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133916,"type":4,"score":2,"title":"常规柴油机缸内燃烧前后的分子变化系数要大于常规汽油机。","position":28,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367133932,"type":3,"score":2,"title":"衡量燃料自燃性的指标是（ ）","position":12,"opts":[],"alt":["十六烷值"]},{"id":3367133933,"type":3,"score":2,"title":"衡量燃料抗爆性的指标是（ ）","position":13,"opts":[],"alt":["辛烷值"]},{"id":3367133934,"type":3,"score":2,"title":"测量十六烷值的两种标准燃料是（ ）和α-甲基萘。","position":14,"opts":[],"alt":["正十六烷"]},{"id":3367133935,"type":3,"score":2,"title":"测量辛烷值的两种标准燃料是（ ）和正庚烷。","position":15,"opts":[],"alt":["异辛烷"]},{"id":3367133928,"type":3,"score":2,"title":"我国采用（ ）作为汽油规格标号。","position":16,"opts":[],"alt":["研究法辛烷值","RON"]},{"id":3367133929,"type":3,"score":2,"title":"我国采用（ ）作为柴油规格标号。","position":17,"opts":[],"alt":["凝点"]},{"id":3367133930,"type":3,"score":2,"title":"常规汽油机采用预制均质混合气形成方式，HCCI汽油机采用（ ）混合气形成方式。","position":18,"opts":[],"alt":["预制均质","均质"]},{"id":3367133931,"type":3,"score":2,"title":"常规汽油机采用火花点火着火方式，HCCI汽油机采用（ ）着火方式。","position":19,"opts":[],"alt":["压缩","压燃"]},{"id":3367133908,"type":3,"score":2,"title":"对内燃机工作过程影响最大的工质热力参数是比热容和（ ）。","position":20,"opts":[],"alt":["等熵指数"]},{"id":3367133917,"type":3,"score":2,"title":"典型的含氧代用燃料主要有三类，包括（ ）、醚类、酯类。","position":29,"opts":[],"alt":["醇类"]}]},{"quizId":"1247057250","name":"第四章测验","no":4,"questions":[{"id":3367137267,"type":1,"score":2,"title":"内燃机的机械损失功不包括（ ）","position":0,"opts":[{"t":"活塞组件摩擦损失功","a":false},{"t":"发电机消耗功","a":true},{"t":"冷却水泵消耗功","a":false},{"t":"泵气损失功","a":false}]},{"id":3367137276,"type":1,"score":2,"title":"提高循环的等容度意味着（ ）","position":1,"opts":[{"t":"增大加热量","a":false},{"t":"靠近上止点加热","a":true},{"t":"减少放热量","a":false},{"t":"靠近下止点放热","a":false}]},{"id":3367137277,"type":1,"score":2,"title":"高增压柴油机测定机械损失可以采用的方法是（ ）","position":2,"opts":[{"t":"示功图法","a":true},{"t":"油耗线法","a":false},{"t":"倒拖法","a":false},{"t":"灭缸法","a":false}]},{"id":3367137278,"type":1,"score":2,"title":"早期柴油机喷油压力低，喷油及燃烧持续期长，工作循环接近于（ ）","position":3,"opts":[{"t":"理想循环","a":false},{"t":"混合加热循环","a":false},{"t":"等压加热循环","a":true},{"t":"等容加热循环","a":false}]},{"id":3367137279,"type":1,"score":2,"title":"现代汽油机的实际工作循环接近于（ ）","position":4,"opts":[{"t":"混合加热循环","a":true},{"t":"理想循环","a":false},{"t":"等容加热循环","a":false},{"t":"等压加热循环","a":false}]},{"id":3367137272,"type":1,"score":2,"title":"内燃机的理论循环模型中假定燃烧是一个（ ）","position":5,"opts":[{"t":"绝热过程","a":false},{"t":"等容过程","a":false},{"t":"加热过程","a":true},{"t":"等压过程","a":false}]},{"id":3367137273,"type":1,"score":2,"title":"考虑真实工质特性后，理想循环的热效率相比理论循环（ ）","position":6,"opts":[{"t":"不确定","a":false},{"t":"维持不变","a":false},{"t":"上升了","a":false},{"t":"下降了","a":true}]},{"id":3367137257,"type":1,"score":2,"title":"早期汽油机因转速低、燃烧较快而接近于（ ）","position":22,"opts":[{"t":"理想循环","a":false},{"t":"等压加热循环","a":false},{"t":"混合加热循环","a":false},{"t":"等容加热循环","a":true}]},{"id":3367137274,"type":4,"score":2,"title":"内燃机转速一定负荷增加时，机械效率增加。","position":7,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137275,"type":4,"score":2,"title":"内燃机的机械效率随着活塞平均运动速度和转速的上升而下降。","position":8,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137252,"type":4,"score":2,"title":"汽油机的机械损失可以采用示功图法、倒拖法和油耗线法测定。","position":9,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137253,"type":4,"score":2,"title":"内燃机等容加热循环的压力升高比对循环热效率没有影响。","position":10,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137254,"type":4,"score":2,"title":"内燃机理论循环的假设主要是实际工质和封闭的理想热力循环。","position":11,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137255,"type":4,"score":2,"title":"内燃机混合加热循环的容积预膨胀比越大，循环热效率越高。","position":12,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137248,"type":4,"score":2,"title":"同一机型在不同的加热模式下，等容循环等容度最高热效率也最高。","position":13,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137258,"type":4,"score":2,"title":"等容度和等容加热不是一回事，等容度包含了燃烧相位的影响。","position":23,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137259,"type":4,"score":2,"title":"内燃机的机械效率随着负荷和转速的上升而增加。","position":24,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137249,"type":3,"score":2,"title":"内燃机的机械损失功主要由机械摩擦功、附件消耗功和（ ）功三部分组成。","position":14,"opts":[],"alt":["泵气损失"]},{"id":3367137250,"type":3,"score":2,"title":"内燃机等容加热循环的热效率主要取决于（ ）和等熵指数两个参数。","position":15,"opts":[],"alt":["压缩比"]},{"id":3367137251,"type":3,"score":2,"title":"内燃机真实循环的换气损失包括自由排气损失和（ ）两部分。","position":16,"opts":[],"alt":["泵气损失"]},{"id":3367137260,"type":3,"score":2,"title":"根据工质和循环特征，内燃机循环模式可以分为理论循环、（ ）和真实循环三种。","position":17,"opts":[],"alt":["理想循环"]},{"id":3367137261,"type":3,"score":2,"title":"内燃机真实循环的指示热效率与理想循环的热效率之比称为（ ）。","position":18,"opts":[],"alt":["相对热效率"]},{"id":3367137262,"type":3,"score":2,"title":"单缸小型自吸柴油机可以采用示功图法、倒拖法和（ ）法测定机械损失。","position":19,"opts":[],"alt":["油耗线"]},{"id":3367137263,"type":3,"score":2,"title":"根据加热方式不同，内燃机的理论循环可以分为等容加热循环、等压加热循环和（ ）三类。","position":20,"opts":[],"alt":["混合加热循环"]},{"id":3367137256,"type":3,"score":2,"title":"影响内燃机混合加热循环热效率的循环参数包括压缩比、等熵指数、（ ）和容积预膨胀比。","position":21,"opts":[],"alt":["压力升高比"]},{"id":3367137236,"type":3,"score":2,"title":"汽油机的机械损失可以采用示功图法、（ ）法两种方法进行测定。","position":25,"opts":[],"alt":["倒拖"]}]},{"quizId":"1247056300","name":"第五章测验","no":5,"questions":[{"id":3367137237,"type":1,"score":2,"title":"下列四个配气相位中，对换气损失影响最大的相位是（ ）","position":0,"opts":[{"t":"进气晚关角","a":false},{"t":"进气早开角","a":false},{"t":"排气早开角","a":true},{"t":"排气晚关角","a":false}]},{"id":3367137238,"type":1,"score":2,"title":"下列四个配气相位角中，对进气充量影响最大的相位是（ ）","position":1,"opts":[{"t":"进气早开角","a":false},{"t":"进气晚关角","a":true},{"t":"排气晚关角","a":false},{"t":"排气早开角","a":false}]},{"id":3367137239,"type":1,"score":2,"title":"四冲程内燃机换气过程存在气门重叠的原因是（ ）","position":2,"opts":[{"t":"进气门晚关和排气门晚关","a":false},{"t":"进气门早开和排气门晚关","a":true},{"t":"进气门早开和排气门早开","a":false},{"t":"进气门晚关和排气门早开","a":false}]},{"id":3367137232,"type":1,"score":2,"title":"评价内燃机换气过程完善程度的指标是（ ）","position":3,"opts":[{"t":"平均进气马赫数","a":false},{"t":"充量系数","a":true},{"t":"热效率","a":false},{"t":"机械效率","a":false}]},{"id":3367137233,"type":1,"score":2,"title":"各个机型的气门重叠角从大到小排列正确的是（ ）","position":4,"opts":[{"t":"增压柴油机>自吸柴油机>自吸汽油机","a":true},{"t":"自吸柴油机>增压柴油机>自吸汽油机","a":false},{"t":"增压柴油机>自吸汽油机>自吸柴油机","a":false},{"t":"自吸汽油机>自吸柴油机>增压柴油机","a":false}]},{"id":3367137234,"type":1,"score":2,"title":"内燃机最佳配气相位角随转速的增加而（ ）","position":5,"opts":[{"t":"减小","a":false},{"t":"不变","a":false},{"t":"增大","a":true},{"t":"不确定","a":false}]},{"id":3367137235,"type":1,"score":2,"title":"以下对内燃机充量系数影响较小的是（ ）","position":6,"opts":[{"t":"进气温升","a":false},{"t":"进气阻力","a":false},{"t":"配气相位","a":false},{"t":"进气状态","a":true}]},{"id":3367137244,"type":1,"score":2,"title":"进气门开启形成的压力波第一次反射回进气门处，将形成（ ）","position":7,"opts":[{"t":"疏波","a":false},{"t":"左行波","a":false},{"t":"压缩波","a":true},{"t":"膨胀波","a":false}]},{"id":3367137245,"type":4,"score":2,"title":"在可变进气系统中，为了利用进气系统动态效应提升充量系数，低速时使进气通过短管进入气缸，高速时使进气通过长管进入气缸。","position":8,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137246,"type":4,"score":2,"title":"增大进气晚关角有利于高速大功率，但会降低低速最大扭矩。","position":9,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137247,"type":4,"score":2,"title":"内燃机的充量系数总是小于1的。","position":10,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137240,"type":4,"score":2,"title":"在超临界排气期，内燃机排气量由缸内和排气背压的压差决定。","position":11,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137241,"type":4,"score":2,"title":"内燃机进气涡流越强，进气阻力越大，则充量系数越小。","position":12,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137242,"type":4,"score":2,"title":"采用多气门技术可以降低平均进气马赫数，从而加大进气充量。","position":13,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137218,"type":4,"score":2,"title":"内燃机自由排气阶段从排气冲程下止点活塞上行开始。","position":21,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137219,"type":4,"score":2,"title":"可变进气歧管长度技术主要是为了利用进气波动效应中的返回疏波，提升充气效率和改善内燃机动力性。","position":22,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137243,"type":3,"score":2,"title":"内燃机的换气系统包括进气系统和（ ）两部分。","position":14,"opts":[],"alt":["排气系统"]},{"id":3367137220,"type":3,"score":2,"title":"内燃机的换气过程主要分为三个阶段，即排气过程、进气过程和（ ）。","position":15,"opts":[],"alt":["气门重叠过程"]},{"id":3367137221,"type":3,"score":2,"title":"内燃机排气过程可以细分为自由排气和（ ）两个阶段。","position":16,"opts":[],"alt":["强制排气"]},{"id":3367137222,"type":3,"score":2,"title":"内燃机自由排气阶段可以细分为（ ）和亚临界排气两个时期。","position":17,"opts":[],"alt":["超临界排气"]},{"id":3367137223,"type":3,"score":2,"title":"内燃机排气损失主要包括自由排气损失和（ ）两部分。","position":18,"opts":[],"alt":["泵气损失"]},{"id":3367137216,"type":3,"score":2,"title":"四冲程内燃机进排气相位角中，（ ）角对进气充量影响最大。","position":19,"opts":[],"alt":["进气晚关","进气晚关角"]},{"id":3367137217,"type":3,"score":2,"title":"四冲程内燃机进排气相位角中，（ ）角对换气损失影响最大。","position":20,"opts":[],"alt":["排气早开","排气早开角"]},{"id":3367137228,"type":3,"score":2,"title":"影响内燃机充量系数的主要因素包括（ ）、进气温升、进排气相位角及其他等。","position":23,"opts":[],"alt":["进气阻力"]}]},{"quizId":"1247059047","name":"第六章测验","no":6,"questions":[{"id":3367130244,"type":1,"score":2,"title":"下列关于预混合燃烧和扩散燃烧说法错误的是（ ）","position":0,"opts":[{"t":"预混合燃烧浓度和温度分布较为均匀，而扩散燃烧容易产生局部高温缺氧现象","a":false},{"t":"预混合燃烧可燃混合气浓度范围小，而扩散燃烧可以实现较高空燃比的稀燃","a":false},{"t":"预混合燃烧火焰呈均匀透明的蓝色，而扩散燃烧有黄或白色的强烈辐射光，两者均称为有焰燃烧","a":true},{"t":"预混合燃烧速度主要取决于化学反应速度，而扩散燃烧速度主要取决于混合气形成速度","a":false}]},{"id":3367130245,"type":1,"score":2,"title":"以下具有高温单阶段着火特点的是（ ）","position":1,"opts":[{"t":"HCCI","a":false},{"t":"汽油机爆燃","a":false},{"t":"汽油火花点火","a":true},{"t":"柴油机压燃","a":false}]},{"id":3367130246,"type":1,"score":2,"title":"汽油机最易点燃的混合气过量空气系数为（ ）","position":2,"opts":[{"t":"1.2","a":false},{"t":"1.0","a":true},{"t":"2.0","a":false},{"t":"0.8","a":false}]},{"id":3367130247,"type":1,"score":2,"title":"层流火焰传播速度一般（ ）","position":3,"opts":[{"t":">100m/s","a":false},{"t":"1-10m/s","a":false},{"t":"<1m/s","a":true},{"t":"10-100m/s","a":false}]},{"id":3367130240,"type":1,"score":2,"title":"柴油机喷雾扩散燃烧时，喷油束的着火位置通常在（ ）","position":4,"opts":[{"t":"油束核心","a":false},{"t":"油束外缘","a":false},{"t":"油束根部","a":false},{"t":"核心和外缘之间浓度合适的地方","a":true}]},{"id":3367130241,"type":1,"score":2,"title":"层流火焰传播速度最大值一般出现在（ ）","position":5,"opts":[{"t":"化学计量空燃比","a":false},{"t":"依燃料而定","a":false},{"t":"化学计量空燃比略浓","a":true},{"t":"化学计量空燃比略稀","a":false}]},{"id":3367130997,"type":1,"score":2,"title":"以下具有低温多阶段着火特点的是（ ）","position":17,"opts":[{"t":"汽油机爆燃","a":true},{"t":"柴油机着火后喷入气缸燃料的燃烧","a":false},{"t":"汽油机表面点火","a":false},{"t":"汽油火花点火","a":false}]},{"id":3367130998,"type":1,"score":2,"title":"柴油机的缸内燃烧属于（ ）","position":18,"opts":[{"t":"扩散燃烧","a":false},{"t":"预混合燃烧","a":false},{"t":"扩散燃烧加部分预混合燃烧","a":true},{"t":"固相燃烧","a":false}]},{"id":3367130242,"type":4,"score":2,"title":"热着火理论认为当放热速率大于散热速率时混合气才可能着火。","position":6,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367130243,"type":4,"score":2,"title":"柴油机压燃和汽油机爆燃都属于高温单阶段着火。","position":7,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367130252,"type":4,"score":2,"title":"提高混合气的湍流程度是加快火焰传播改善汽油机燃烧的有效手段。","position":8,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367130253,"type":4,"score":2,"title":"单个油滴在静止空气中的蒸发和燃烧属于典型的扩散燃烧。","position":9,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367130254,"type":4,"score":2,"title":"p-V示功图主要用于内燃机热力循环分析，p-φ示功图主要用于内燃机燃烧过程分析。","position":10,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367130999,"type":4,"score":2,"title":"柴油是液体燃料，但柴油机的燃烧是以气相燃烧方式进行的。","position":19,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367130992,"type":4,"score":2,"title":"一般层流火焰传播速度越快，则火焰前锋面越薄。","position":20,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367130993,"type":4,"score":2,"title":"油滴群的着火与整个燃烧室内的宏观空燃比有关，只有宏观空燃比合适，油滴群才能发生一点或多点同时着火。","position":21,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367130255,"type":3,"score":2,"title":"气相燃烧可分为预混合燃烧和（ ）燃烧两类。","position":11,"opts":[],"alt":["扩散"]},{"id":3367130248,"type":3,"score":2,"title":"内燃机燃烧放热率可以分为瞬时放热率和（ ）两个。","position":12,"opts":[],"alt":["累积放热率"]},{"id":3367130249,"type":3,"score":2,"title":"整个液体燃料的喷雾过程可分为（ ）和分裂雾化两个阶段。","position":13,"opts":[],"alt":["液柱阶段"]},{"id":3367130250,"type":3,"score":2,"title":"衡量柴油等液体燃料喷雾特性的指标包括贯穿距离、（ ）和喷雾粒径等。","position":14,"opts":[],"alt":["喷雾锥角"]},{"id":3367130251,"type":3,"score":2,"title":"内燃机可燃混合气的着火理论主要有两种，即（ ）理论和链式反应着火理论。","position":15,"opts":[],"alt":["热着火"]},{"id":3367130996,"type":3,"score":2,"title":"根据燃烧时燃料物理形态不同，燃烧可以分为气相燃烧和固相燃烧两类，内燃机中的燃烧属于（ ）相燃烧方式。","position":16,"opts":[],"alt":["气","气相"]},{"id":3367130994,"type":3,"score":2,"title":"以均质混合气工作的汽油机一般采取（ ）和火焰传播的燃烧方式。","position":22,"opts":[],"alt":["火花点火"]},{"id":3367130995,"type":3,"score":2,"title":"完整的燃烧过程包括着火和燃烧两部分，其中着火又可以分为（ ）着火和强迫着火两类。","position":23,"opts":[],"alt":["自燃"]}]},{"quizId":"1247061535","name":"第七章测验","no":7,"questions":[{"id":3367133918,"type":1,"score":2,"title":"柴油机速燃期和缓燃期对应的燃烧分别是（ ）","position":0,"opts":[{"t":"扩散燃烧和预混合燃烧","a":false},{"t":"预混合燃烧和扩散燃烧","a":true},{"t":"均为预混合燃烧","a":false},{"t":"均为扩散燃烧","a":false}]},{"id":3367133919,"type":1,"score":2,"title":"柴油机速燃期主要关注的指标是（ ）","position":1,"opts":[{"t":"最高爆发压力","a":false},{"t":"最高燃烧温度","a":false},{"t":"压力升高率","a":true},{"t":"温度升高率","a":false}]},{"id":3367133912,"type":1,"score":2,"title":"柴油机压力升高率主要取决于（ ）","position":2,"opts":[{"t":"滞燃期","a":true},{"t":"后燃期","a":false},{"t":"速燃期","a":false},{"t":"缓燃期","a":false}]},{"id":3367133913,"type":1,"score":2,"title":"柴油机理想的放热规律应是（ ）","position":3,"opts":[{"t":"先急后缓再急","a":false},{"t":"先急后缓","a":false},{"t":"均匀放热","a":false},{"t":"先缓后急","a":true}]},{"id":3367133914,"type":1,"score":2,"title":"传统柴油机的喷油时刻和供油时刻相比（ ）","position":4,"opts":[{"t":"提前","a":false},{"t":"滞后","a":true},{"t":"不确定","a":false},{"t":"同步","a":false}]},{"id":3367133915,"type":1,"score":2,"title":"以下不属于柴油机的燃油异常喷射现象的是（ ）","position":5,"opts":[{"t":"预喷和后喷","a":true},{"t":"滴油现象","a":false},{"t":"断续喷射","a":false},{"t":"气穴和穴蚀","a":false}]},{"id":3367133892,"type":1,"score":2,"title":"以下柴油机燃烧室中对燃油喷射系统要求最高的是（ ）","position":6,"opts":[{"t":"浅盘形燃烧室","a":true},{"t":"四角形燃烧室","a":false},{"t":"深坑形燃烧室","a":false},{"t":"球形燃烧室","a":false}]},{"id":3367133893,"type":1,"score":2,"title":"以下柴油机燃烧室中采用油气相互运动混合气形成方式的是（ ）","position":7,"opts":[{"t":"非直喷燃烧室","a":false},{"t":"浅盘形燃烧室","a":false},{"t":"球形燃烧室","a":false},{"t":"深坑形燃烧室","a":true}]},{"id":3367133894,"type":1,"score":2,"title":"以下柴油机燃烧室中采用壁面油膜蒸发混合方式的是（ ）","position":8,"opts":[{"t":"球形燃烧室","a":true},{"t":"四角形燃烧室","a":false},{"t":"深坑形燃烧室","a":false},{"t":"浅盘形燃烧室","a":false}]},{"id":3367133895,"type":1,"score":2,"title":"柴油机喷油速率在喷射初期（滞燃期）应（ ）","position":9,"opts":[{"t":"不变","a":false},{"t":"不确定","a":false},{"t":"较大","a":false},{"t":"较小","a":true}]},{"id":3367133888,"type":1,"score":2,"title":"柴油机球形燃烧室属于（ ）","position":10,"opts":[{"t":"非直喷式燃烧室","a":false},{"t":"预燃室式燃烧室","a":false},{"t":"直喷式燃烧室","a":true},{"t":"涡流室式燃烧室","a":false}]},{"id":3367133884,"type":1,"score":2,"title":"柴油机理想的喷油规律应是（ ）。","position":30,"opts":[{"t":"先缓后急","a":true},{"t":"先急后缓再急","a":false},{"t":"先急后缓","a":false},{"t":"均匀喷射","a":false}]},{"id":3367133889,"type":4,"score":2,"title":"为获得好的动力性和经济性，一般希望内燃机放热始点能保证最高爆发压力出现在上止点后10-15°CA。","position":11,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133890,"type":4,"score":2,"title":"传统柴油机柱塞泵供油规律主要由油泵凸轮和柱塞几何尺寸决定。","position":12,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367133891,"type":4,"score":2,"title":"压力升高率是表征内燃机燃烧等容度和粗暴度的指标。","position":13,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133900,"type":4,"score":2,"title":"为控制柴油机压力升高率应增加滞燃期内可燃混合气的量。","position":14,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367133901,"type":4,"score":2,"title":"柴油机滞燃期内形成的非均质混合气是在缸内高温、高压环境下多点同时着火燃烧的。","position":15,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133902,"type":4,"score":2,"title":"柴油机理想放热过程应尽量做到速燃期不速、缓燃期不缓和后燃期不后。","position":16,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133903,"type":4,"score":2,"title":"采用油膜蒸发混合的柴油机燃烧放热速率呈现先缓后急的规律。","position":17,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133872,"type":4,"score":2,"title":"放热始点控制汽油机通过点火提前角调整实现，柴油机通过喷油相位调整实现。","position":26,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367133896,"type":3,"score":2,"title":"直喷式柴油机燃烧过程中会出现“双峰”放热现象，第一个放热峰对应（ ）阶段。","position":18,"opts":[],"alt":["预混合燃烧","速燃期","速燃期预混合燃烧"]},{"id":3367133898,"type":3,"score":2,"title":"柴油机混合气的形成方式主要分为（ ）和壁面油膜蒸发混合两大类。","position":20,"opts":[],"alt":["空间雾化混合"]},{"id":3367133899,"type":3,"score":2,"title":"内燃机缸内气流运动的形式主要包括涡流、挤流、滚流和（ ）四种。","position":21,"opts":[],"alt":["湍流"]},{"id":3367133876,"type":3,"score":2,"title":"考察柴油机喷油特性的指标主要包括（ ）和喷油特性。","position":22,"opts":[],"alt":["喷雾特性"]},{"id":3367133877,"type":3,"score":2,"title":"传统柴油机的燃油喷射过程主要分为三个阶段，即（ ）阶段、主喷射阶段和喷油结束阶段。","position":23,"opts":[],"alt":["喷射延迟"]},{"id":3367133878,"type":3,"score":2,"title":"内燃机放热规律的三要素是指（ ）、放热持续期和放热速率曲线形状。","position":24,"opts":[],"alt":["燃烧放热始点"]},{"id":3367133879,"type":3,"score":2,"title":"柴油机的燃烧过程可分为四个时期，即滞燃期、（ ）、缓燃期和后燃期。","position":25,"opts":[],"alt":["速燃期"]},{"id":3367133873,"type":3,"score":2,"title":"柴油机燃烧室可以分为直喷式和非直喷式两类，其中球形燃烧室属于（ ）燃烧室。","position":27,"opts":[],"alt":["直喷式"]},{"id":3367133874,"type":3,"score":2,"title":"柴油机混合气的形成过程主要依靠对柴油喷射、（ ）以及燃烧室形状的三者合理匹配。","position":28,"opts":[],"alt":["气流运动"]},{"id":3367133875,"type":3,"score":2,"title":"柴油机电控燃油喷射系统按原理不同可分为位置控制式、时间控制式和（ ）三类。","position":29,"opts":[],"alt":["压力时间控制式"]},{"id":3367133897,"type":3,"score":2,"title":"直喷式柴油机燃烧过程中会出现“双峰”放热现象，第二个放热峰对应（ ）阶段。","position":null,"opts":[],"alt":["扩散燃烧","缓燃期","缓燃期扩散燃烧"]}]},{"quizId":"1247057252","name":"第八章测验","no":8,"questions":[{"id":3367137229,"type":1,"score":2,"title":"汽油机燃烧过程最高爆发压力的位置调整手段是（ ）","position":0,"opts":[{"t":"喷油提前角","a":false},{"t":"点火提前角","a":true},{"t":"点火能量","a":false},{"t":"喷油量","a":false}]},{"id":3367137230,"type":1,"score":2,"title":"以下汽油机工况中比较容易发生爆燃的是（ ）","position":1,"opts":[{"t":"低速高负荷","a":true},{"t":"低速低负荷","a":false},{"t":"高速低负荷","a":false},{"t":"高速高负荷","a":false}]},{"id":3367137231,"type":1,"score":2,"title":"汽油机发生爆燃的本质原因是终端混合气（ ）","position":2,"opts":[{"t":"火焰传播不到","a":false},{"t":"被炽热点点燃","a":false},{"t":"发生自燃","a":true},{"t":"被火花塞点燃","a":false}]},{"id":3367137225,"type":1,"score":2,"title":"提高压缩比使汽油机爆燃倾向加大，为此可以采取（ ）","position":4,"opts":[{"t":"减小喷油提前角","a":false},{"t":"加大喷油提前角","a":false},{"t":"减小点火提前角","a":true},{"t":"加大点火提前角","a":false}]},{"id":3367137226,"type":1,"score":2,"title":"汽油机早燃通常发生在火花点火（ ）","position":5,"opts":[{"t":"之后","a":false},{"t":"不确定","a":false},{"t":"之前","a":true},{"t":"同时","a":false}]},{"id":3367137227,"type":1,"score":2,"title":"汽油机在大负荷尤其在外特性工作时主要追求动力性，因此会使用功率混合气，即空燃比范围（ ）","position":6,"opts":[{"t":"1.05-1.15","a":false},{"t":"0.85-0.95","a":true},{"t":"0.95-1.05","a":false},{"t":"0.75-0.85","a":false}]},{"id":3367137204,"type":1,"score":2,"title":"以下汽油机燃烧室中，动力性、经济性和高速适应性最好的是（ ）","position":7,"opts":[{"t":"浴盆形燃烧室","a":false},{"t":"半球形燃烧室","a":false},{"t":"楔形燃烧室","a":false},{"t":"篷形燃烧室","a":true}]},{"id":3367137205,"type":1,"score":2,"title":"以下汽油机中节油率最高的是（ ）","position":8,"opts":[{"t":"均质当量比GDI","a":false},{"t":"分层稀燃GDI","a":true},{"t":"均质稀燃PFI","a":false},{"t":"分层稀燃PFI","a":false}]},{"id":3367137206,"type":1,"score":2,"title":"为实现超高空燃比的稀薄燃烧，汽油机燃油雾化方式宜采用（ ）","position":9,"opts":[{"t":"多点电喷","a":false},{"t":"化油器式","a":false},{"t":"缸内直喷","a":true},{"t":"单点电喷","a":false}]},{"id":3367137207,"type":1,"score":2,"title":"汽油机转速升高时，点火提前角应（ ）","position":10,"opts":[{"t":"减小","a":false},{"t":"不变","a":false},{"t":"不确定","a":false},{"t":"增大","a":true}]},{"id":3367137224,"type":1,"score":2,"title":"以下不能降低汽油机爆燃倾向的是（ ）","position":null,"opts":[{"t":"加浓混合气","a":true},{"t":"降低压缩比","a":false},{"t":"减小点火提前角","a":false},{"t":"提高燃料辛烷值","a":false}]},{"id":3367137200,"type":4,"score":2,"title":"汽油机爆燃通常在压缩比较高和大负荷时出现。","position":11,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137201,"type":4,"score":2,"title":"汽油机早燃发出的是低频敲缸声，而爆燃则是高频敲缸声。","position":12,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137202,"type":4,"score":2,"title":"通过推迟点火可以减轻和消除汽油机爆燃，但无法消除表面点火。","position":13,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137203,"type":4,"score":2,"title":"柴油机的转速和转矩波动程度比汽油机大。","position":14,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137212,"type":4,"score":2,"title":"汽油机后火若不引发爆燃，一般危害不大，因此不用关注。","position":15,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137213,"type":4,"score":2,"title":"凡是能促进燃烧室温度和压力升高以及积炭形成的因素，都能促成汽油机表面点火。","position":16,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137214,"type":4,"score":2,"title":"分层稀燃主要是为了解决汽油机燃油经济性和排气污染问题。","position":17,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137215,"type":4,"score":2,"title":"均质当量比GDI采用化学计量比燃烧而非稀燃，因而无法节油。","position":18,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137208,"type":3,"score":2,"title":"汽油机燃烧过程可以分为三个阶段，分别为（ ）、明显燃烧期和后燃期。","position":19,"opts":[],"alt":["着火落后期","滞燃期"]},{"id":3367137209,"type":3,"score":2,"title":"汽油机的燃烧属于预混合燃烧方式，其特点是火花点火和（ ）。","position":20,"opts":[],"alt":["火焰传播"]},{"id":3367137210,"type":3,"score":2,"title":"汽油机的不正常燃烧主要有（ ）和表面点火两种。","position":21,"opts":[],"alt":["爆燃","爆震"]},{"id":3367137211,"type":3,"score":2,"title":"汽油机程度严重或长时间的早火往往会引发爆燃，其危害程度比普通爆燃更厉害，称之为（ ）。","position":22,"opts":[],"alt":["爆燃性表面点火","激爆"]},{"id":3367137188,"type":3,"score":2,"title":"常用最高爆发压力的（ ）参数来评价内燃机循环波动的程度。","position":23,"opts":[],"alt":["循环波动率"]},{"id":3367137189,"type":3,"score":2,"title":"表征内燃机燃烧室紧凑性的指标是（ ）。","position":24,"opts":[],"alt":["面容比"]},{"id":3367137190,"type":3,"score":2,"title":"汽油机中燃料供给方式主要有化油器、（ ）和缸内直喷三种。","position":25,"opts":[],"alt":["进气道喷射"]},{"id":3367137191,"type":3,"score":2,"title":"汽油机的不规则燃烧主要有（ ）和各缸工作不均匀两种。","position":26,"opts":[],"alt":["循环波动"]},{"id":3367137184,"type":3,"score":2,"title":"根据缸内混合气浓度的均匀程度不同，稀燃可以分为均质稀燃和（ ）。","position":27,"opts":[],"alt":["分层稀燃"]},{"id":3367137185,"type":3,"score":2,"title":"根据燃料供给方式不同，稀燃可以分为直喷稀燃和（ ）。","position":28,"opts":[],"alt":["非直喷稀燃"]},{"id":3367137186,"type":3,"score":2,"title":"非直喷汽油机实现分层稀燃的方法有主副燃烧室、（ ）和径向分层等。","position":29,"opts":[],"alt":["轴向分层"]},{"id":3367137187,"type":3,"score":2,"title":"分层稀燃GDI的混合气形成方式可以分为喷雾引导、壁面引导和（ ）三类。","position":30,"opts":[],"alt":["气流引导"]}]},{"quizId":"1247058210","name":"第九章测验","no":9,"questions":[{"id":3367131980,"type":1,"score":2,"title":"对光化学烟雾有重要促成作用的内燃机污染物是（ ）","position":0,"opts":[{"t":"PM和NOx","a":false},{"t":"CO和HC","a":false},{"t":"CO和NOx","a":false},{"t":"HC和NOx","a":true}]},{"id":3367131981,"type":1,"score":2,"title":"用于评价不同内燃机之间排放水平的指标是（ ）","position":1,"opts":[{"t":"体积浓度排放量","a":false},{"t":"质量排放量","a":false},{"t":"质量浓度排放量","a":false},{"t":"比排放量","a":true}]},{"id":3367131982,"type":1,"score":2,"title":"内燃机NO生成的有利条件是（ ）","position":2,"opts":[{"t":"高温缺氧","a":false},{"t":"低温富氧","a":false},{"t":"高温富氧","a":true},{"t":"低温缺氧","a":false}]},{"id":3367131983,"type":1,"score":2,"title":"以下不属于内燃机CO排放生成途径的是（ ）","position":3,"opts":[{"t":"排气HC不完全氧化","a":false},{"t":"CO2高温热解","a":false},{"t":"壁面淬熄效应","a":true},{"t":"燃料不完全燃烧","a":false}]},{"id":3367131976,"type":1,"score":2,"title":"内燃机炭烟生成的有利条件是（ ）","position":4,"opts":[{"t":"高温富氧","a":false},{"t":"高温缺氧","a":true},{"t":"低温富氧","a":false},{"t":"低温缺氧","a":false}]},{"id":3367131977,"type":1,"score":2,"title":"非直喷式柴油机与直喷式柴油机相比（ ）","position":5,"opts":[{"t":"排放性好，经济性好","a":false},{"t":"排放性好，经济性差","a":true},{"t":"排放性差，经济性好","a":false},{"t":"排放性差，经济性差","a":false}]},{"id":3367131978,"type":1,"score":2,"title":"以下不属于汽油机机内净化技术的是（ ）","position":6,"opts":[{"t":"三元催化净化","a":true},{"t":"提高点火能量","a":false},{"t":"推迟点火时间","a":false},{"t":"废气再循环","a":false}]},{"id":3367131979,"type":1,"score":2,"title":"理想低排放柴油机燃烧过程，其核心控制思想是（ ）","position":7,"opts":[{"t":"抑制预混合燃烧，促进扩散燃烧","a":true},{"t":"促进预混合燃烧，抑制扩散燃烧","a":false},{"t":"抑制预混合燃烧，抑制扩散燃烧","a":false},{"t":"促进预混合燃烧，促进扩散燃烧","a":false}]},{"id":3367131956,"type":1,"score":2,"title":"柴油机降低NOx的机内净化技术不包括（ ）","position":8,"opts":[{"t":"改善喷油特性","a":false},{"t":"增压技术","a":true},{"t":"冷却EGR","a":false},{"t":"推迟喷油时间","a":false}]},{"id":3367131957,"type":1,"score":2,"title":"柴油机降低炭烟和微粒排放的机内净化技术不包括（ ）","position":9,"opts":[{"t":"燃油高压喷射","a":false},{"t":"推迟喷油时间","a":true},{"t":"改善喷油特性","a":false},{"t":"增压技术","a":false}]},{"id":3367131958,"type":1,"score":2,"title":"三元催化剂高效工作的空燃比活性窗口在（ ）","position":10,"opts":[{"t":"混合气偏稀区域","a":false},{"t":"混合气偏浓区域","a":false},{"t":"依赖发动机工况","a":false},{"t":"化学计量比附近","a":true}]},{"id":3367131959,"type":1,"score":2,"title":"以下不属于柴油机后处理装置的是（ ）","position":11,"opts":[{"t":"TWC","a":true},{"t":"SCR","a":false},{"t":"DOC","a":false},{"t":"DPF","a":false}]},{"id":3367131952,"type":4,"score":2,"title":"内燃机燃烧过程中产生的NOx主要是NO，另有少量NO2。","position":12,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367131953,"type":4,"score":2,"title":"柴油机受淬熄效应和油膜及积炭吸附效应影响小，因而HC排放通常低于汽油机。","position":13,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367131954,"type":4,"score":2,"title":"柴油机的微粒PM排放指的就是燃料未完全燃烧生成的炭烟。","position":14,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367131955,"type":4,"score":2,"title":"汽油机以降低CO、HC和NOx为主要排放控制目标，而柴油机则以降低微粒和NOx为主要排放控制目标。","position":15,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367131964,"type":4,"score":2,"title":"柴油机理想喷油规律应遵循初期缓慢、中期急速、后期快断原则。","position":16,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367131965,"type":4,"score":2,"title":"柴油机传统燃烧过程NOx与PM存在明显的相悖效应。","position":17,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367131966,"type":4,"score":2,"title":"非直喷柴油机因浓稀两段混合燃烧方式和二次扰动影响，NOx和炭烟排放要低于直喷式柴油机。","position":18,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367131967,"type":4,"score":2,"title":"三元催化剂活性窗口越宽，汽油机电控系统控制精度要求越低。","position":19,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367131960,"type":3,"score":2,"title":"根据有害排放物来源不同，内燃机有害排放物可以分为（ ）和非排气污染物两类。","position":20,"opts":[],"alt":["排气污染物"]},{"id":3367131961,"type":3,"score":2,"title":"根据有害排放物是否纳入法规体系，有害排放物可分为（ ）和非常规排放两类。","position":21,"opts":[],"alt":["常规排放"]},{"id":3367131962,"type":3,"score":2,"title":"内燃机NO生成途径主要包括高温NO、激发NO和燃料NO三种，其中（ ）是内燃机NO排放的主要来源。","position":22,"opts":[],"alt":["高温NO"]},{"id":3367131963,"type":3,"score":2,"title":"在以均质混合气进行燃烧的汽油机中，排气HC产生主要有（ ）、壁面淬熄效应以及壁面油膜和积炭的吸附效应三个途径。","position":23,"opts":[],"alt":["不完全燃烧"]},{"id":3367131940,"type":3,"score":2,"title":"柴油机微粒主要是由（ ）、可溶性有机物和硫酸盐三部分组成。","position":24,"opts":[],"alt":["干炭烟"]},{"id":3367137461,"type":3,"score":2,"title":"内燃机排放污染控制技术可分为（ ）技术、排放后处理技术和非排气污染控制技术三类。","position":25,"opts":[],"alt":["机内净化"]},{"id":3367137462,"type":3,"score":2,"title":"基于电控燃油喷射系统实现（ ）的精确控制，配合三效催化转化器的尾气高效净化，是当前汽油机排放控制的最有效和最主要的技术。","position":26,"opts":[],"alt":["空燃比"]},{"id":3367137463,"type":3,"score":2,"title":"目前主流的柴油机DPF再生方法有两类，分别是断续加热再生和（ ）。","position":27,"opts":[],"alt":["连续催化再生"]},{"id":3367137456,"type":3,"score":2,"title":"汽油机主要气态排放污染物有CO、NOx、（ ）三种。","position":28,"opts":[],"alt":["HC"]},{"id":3367137457,"type":3,"score":2,"title":"柴油机SCR系统主要采用尿素水溶液作为还原剂选择性催化还原（ ）排放物。","position":29,"opts":[],"alt":["NOx","氮氧化物"]},{"id":3367137458,"type":3,"score":2,"title":"柴油机微粒的生成过程可分为炭烟生成、（ ）和微粒形成三个阶段。","position":30,"opts":[],"alt":["炭烟氧化"]},{"id":3367137459,"type":3,"score":2,"title":"柴油机NOx和PM排放控制技术总体上分为燃烧改善、燃料改善和排气后处理三类，其中（ ）属于机外净化技术。","position":31,"opts":[],"alt":["排气后处理"]},{"id":3367137468,"type":3,"score":2,"title":"内燃机常规排放污染物主要有CO、（ ）、HC和PM四种。","position":32,"opts":[],"alt":["NOx","氮氧化物"]}]},{"quizId":"1247059660","name":"第十章测验","no":10,"questions":[{"id":3367137196,"type":1,"score":2,"title":"船舶内燃机实际运转区域为（ ）","position":0,"opts":[{"t":"点工况","a":false},{"t":"线工况","a":true},{"t":"面工况","a":false},{"t":"不确定","a":false}]},{"id":3367137197,"type":1,"score":2,"title":"车用内燃机实际运行区域为（ ）","position":1,"opts":[{"t":"点工况","a":false},{"t":"不确定","a":false},{"t":"线工况","a":false},{"t":"面工况","a":true}]},{"id":3367137198,"type":1,"score":2,"title":"以下参数中不能反映内燃机当前负荷的是（ ）","position":2,"opts":[{"t":"油门开度","a":false},{"t":"输出扭矩","a":false},{"t":"转速","a":true},{"t":"有效平均压力","a":false}]},{"id":3367137199,"type":1,"score":2,"title":"以下不属于内燃机运行特性的是（ ）","position":3,"opts":[{"t":"空燃比特性","a":true},{"t":"万有特性","a":false},{"t":"负荷特性","a":false},{"t":"速度特性","a":false}]},{"id":3367137192,"type":1,"score":2,"title":"内燃机的外特性属于（ ）","position":4,"opts":[{"t":"负荷特性","a":false},{"t":"万有特性","a":false},{"t":"速度特性","a":true},{"t":"调整特性","a":false}]},{"id":3367137193,"type":1,"score":2,"title":"内燃机万有特性图中，最内层的区域是（ ）","position":5,"opts":[{"t":"功率最高区域","a":false},{"t":"油耗最小区域","a":true},{"t":"转矩最大区域","a":false},{"t":"转速最高区域","a":false}]},{"id":3367137194,"type":1,"score":2,"title":"汽车匹配后备功率偏大的内燃机则（ ）","position":6,"opts":[{"t":"动力性差，经济性差","a":false},{"t":"动力性好，经济性好","a":false},{"t":"动力性好，经济性差","a":true},{"t":"动力性差，经济性好","a":false}]},{"id":3367137176,"type":1,"score":2,"title":"汽油机的点火提前特性属于（ ）","position":20,"opts":[{"t":"调整特性","a":true},{"t":"速度特性","a":false},{"t":"万有特性","a":false},{"t":"负荷特性","a":false}]},{"id":3367137177,"type":1,"score":2,"title":"内燃机的速度特性共有（ ）","position":21,"opts":[{"t":"无数条","a":true},{"t":"一条","a":false},{"t":"两条","a":false},{"t":"三条","a":false}]},{"id":3367137195,"type":4,"score":2,"title":"同一内燃机配套不同工作机械时标定功率不一样，通常标定功率下使用时间越长，标定功率应越小。","position":7,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137172,"type":4,"score":2,"title":"内燃机的标定工况指的是内燃机所能达到的极限最大功率点。","position":8,"opts":[{"t":"正确","a":false},{"t":"错误","a":true}]},{"id":3367137173,"type":4,"score":2,"title":"柴油机速度特性需要校正和调速才能满足汽车的动力性和使用要求。","position":9,"opts":[{"t":"错误","a":false},{"t":"正确","a":true}]},{"id":3367137174,"type":4,"score":2,"title":"柴油机的标定功率点通常就是功率外特性曲线的最大值点。","position":10,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137175,"type":4,"score":2,"title":"具有相同标定点的内燃机，转矩储备系数和转速适应系数越大，则动力适应性越好。","position":11,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137168,"type":4,"score":2,"title":"柴油机两级调速器不仅在最高和最低转速起调速作用，在中间转速也能起到调速作用。","position":12,"opts":[{"t":"错误","a":true},{"t":"正确","a":false}]},{"id":3367137178,"type":4,"score":2,"title":"柴油机的有效燃油消耗率曲线比汽油机平坦，尤其在部分负荷区域。","position":22,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137179,"type":4,"score":2,"title":"工程机械柴油机因稳速要求高和强调作业效率，通常采用全程调速器。","position":23,"opts":[{"t":"正确","a":true},{"t":"错误","a":false}]},{"id":3367137169,"type":3,"score":2,"title":"内燃机的运行工况可以用转速和（ ）两个参数表示。","position":13,"opts":[],"alt":["负荷"]},{"id":3367137170,"type":3,"score":2,"title":"油门全开的内燃机速度特性称为内燃机的（ ）。","position":14,"opts":[],"alt":["外特性","全负荷速度特性"]},{"id":3367137171,"type":3,"score":2,"title":"内燃机的速度特性是指内燃机（ ）不变，其性能指标随转速变化的规律。","position":15,"opts":[],"alt":["负荷"]},{"id":3367137180,"type":3,"score":2,"title":"内燃机的负荷特性是指内燃机（ ）不变，其性能指标随负荷变化的规律。","position":16,"opts":[],"alt":["转速"]},{"id":3367137181,"type":3,"score":2,"title":"根据调速范围不同，柴油机存在（ ）和全程调速两种基本的调速模式。","position":17,"opts":[],"alt":["两极调速"]},{"id":3367137182,"type":3,"score":2,"title":"从内燃机工作特点来看，内燃机特性有稳态特性和（ ）特性之分。","position":18,"opts":[],"alt":["动态","瞬态"]},{"id":3367137183,"type":3,"score":2,"title":"从可变因素特点来看，内燃机特性有调整特性和（ ）特性之分。","position":19,"opts":[],"alt":["运行"]}]}];
+const TN = {1:"单选题",2:"多选题",3:"填空题",4:"判断题"};
+const LET = "ABCDEFGHIJ";
+
+const $ = s => document.querySelector(s);
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function norm(s){ return (s||"").toLowerCase().replace(/[\s，。、；：？！（）()【】\[\]"'“”‘’·,.;:?!\-—_]/g,""); }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+let seq = 0;
+const state = { answers: new Map(), revealed: new Set(), optOrder: new Map(), instant: false, examJudged: false };
+function deriveOrder(q, doShuffle){
+  let order = q.opts.map((_, i) => i);
+  if (doShuffle && q.opts.length > 2) shuffle(order);
+  return order;
+}
+function makeInstances(qs, chName, shuffleOpts){
+  return qs.map(q => {
+    const key = "k" + (++seq);
+    state.optOrder.set(key, deriveOrder(q, shuffleOpts));
+    return { q, chName, key };
+  });
+}
+
+function answerText(q){
+  if (q.type === 3) {
+    if (!q.alt || !q.alt.length) return "(缺失)";
+    return q.alt[0] + (q.alt.length > 1 ? "（或：" + q.alt.slice(1).join("、") + "）" : "");
+  }
+  const idx = q.opts.map((o, i) => o.a ? i : -1).filter(i => i >= 0);
+  return idx.map(i => LET[i] + "、" + q.opts[i].t).join("　");
+}
+function judge(inst, ans){
+  const q = inst.q;
+  if (q.type === 3) {
+    if (ans.text == null || ans.text === "") return null;
+    return q.alt.some(a => norm(a) === norm(ans.text));
+  }
+  if (!ans.sel || ans.sel.size === 0) return null;
+  const correct = new Set(q.opts.map((o, i) => o.a ? i : -1).filter(i => i >= 0));
+  if (ans.sel.size !== correct.size) return false;
+  for (const i of ans.sel) if (!correct.has(i)) return false;
+  return true;
+}
+function isShown(inst){ return state.revealed.has(inst.key) || (inst.exam && state.examJudged); }
+
+function renderList(container, instances, opts){
+  container.innerHTML = "";
+  const { mode } = opts || {};
+  instances.forEach((inst, i) => {
+    inst.exam = mode === "exam";
+    const q = inst.q;
+    const card = el("div", "qcard");
+    card.dataset.key = inst.key;
+    const ans = state.answers.get(inst.key) || { sel: new Set(), text: "" };
+    state.answers.set(inst.key, ans);
+    const shown = isShown(inst);
+    let head = '<span class="qno">' + (i + 1) + '.</span>' +
+      '<span class="badge t' + q.type + '">' + TN[q.type] + '</span>' +
+      '<span>' + q.score + '分</span><span>' + inst.chName + '</span>' +
+      '<span class="verdict" data-verdict></span>';
+    if (!(mode === "exam" && !state.examJudged))
+      head += '<button class="ghost reveal-btn" style="margin-left:8px">' + (shown ? "隐藏答案" : "显示答案") + "</button>";
+    card.appendChild(el("div", "qhead", head));
+    card.appendChild(el("div", "qtitle", esc(q.title)));
+
+    if (q.type === 3) {
+      card.appendChild(el("div", "fillrow", '<input type="text" placeholder="请输入答案" value="' + esc(ans.text || "") + '">'));
+    } else {
+      const wrap = el("div", "qopts");
+      state.optOrder.get(inst.key).forEach((oi, pos) => {
+        const o = q.opts[oi];
+        const opt = el("div", "opt", '<span class="L">' + LET[pos] + '.</span><span>' + esc(o.t) + "</span>");
+        opt.dataset.oi = oi;
+        if (ans.sel.has(oi)) opt.classList.add("sel");
+        wrap.appendChild(opt);
+      });
+      card.appendChild(wrap);
+    }
+    const ansBox = el("div", "qans", "答案：<b>" + esc(answerText(q)) + "</b>");
+    ansBox.hidden = !shown;
+    card.appendChild(ansBox);
+    if (shown && q.ana) card.appendChild(el("div", "qana", "解析：" + esc(q.ana)));
+    container.appendChild(card);
+    paint(card, inst);
+  });
+}
+
+function paint(card, inst){
+  const q = inst.q;
+  const ans = state.answers.get(inst.key);
+  const shown = isShown(inst);
+  card.querySelectorAll(".opt").forEach(opt => {
+    const oi = +opt.dataset.oi;
+    opt.classList.remove("ok", "no");
+    if (shown) {
+      if (q.opts[oi].a) opt.classList.add("ok");
+      else if (ans.sel.has(oi)) opt.classList.add("no");
+    }
+  });
+  const v = card.querySelector("[data-verdict]");
+  if (shown) {
+    const j = judge(inst, ans);
+    if (j === true) { v.textContent = "✓ 答对"; v.className = "verdict ok"; card.classList.add("right"); card.classList.remove("wrong"); }
+    else if (j === false) { v.textContent = "✗ 答错"; v.className = "verdict no"; card.classList.add("wrong"); card.classList.remove("right"); }
+    else { v.textContent = "未作答"; v.className = "verdict"; card.classList.remove("right", "wrong"); }
+  } else {
+    v.textContent = ""; v.className = "verdict"; card.classList.remove("right", "wrong");
+  }
+}
+
+function updateStat(statEl, instances){
+  let answered = 0, correct = 0, shown = 0;
+  instances.forEach(inst => {
+    const j = judge(inst, state.answers.get(inst.key));
+    if (j !== null) answered++;
+    if (j === true && isShown(inst)) correct++;
+    if (isShown(inst)) shown++;
+  });
+  statEl.textContent = "共 " + instances.length + " 题 · 已答 " + answered + " · 答对 " + correct + (shown ? " · 已显示答案 " + shown : "");
+}
+
+function bindPanel(listEl, statEl, getInstances, mode){
+  listEl.addEventListener("click", e => {
+    const card = e.target.closest(".qcard"); if (!card) return;
+    const key = card.dataset.key;
+    const inst = getInstances().find(x => x.key === key); if (!inst) return;
+    if (e.target.closest(".reveal-btn")) {
+      if (state.revealed.has(key)) state.revealed.delete(key); else state.revealed.add(key);
+      card.querySelector(".qans").hidden = !state.revealed.has(key);
+      const ana = card.querySelector(".qana");
+      if (ana) ana.hidden = !state.revealed.has(key);
+      card.querySelector(".reveal-btn").textContent = state.revealed.has(key) ? "隐藏答案" : "显示答案";
+      paint(card, inst); updateStat(statEl, getInstances());
+      return;
+    }
+    const opt = e.target.closest(".opt"); if (!opt) return;
+    const q = inst.q, ans = state.answers.get(key), oi = +opt.dataset.oi;
+    if (q.type === 2) { ans.sel.has(oi) ? ans.sel.delete(oi) : ans.sel.add(oi); }
+    else { ans.sel = new Set([oi]); }
+    if (state.instant) state.revealed.add(key);
+    card.querySelector(".qans").hidden = !isShown(inst);
+    paint(card, inst); updateStat(statEl, getInstances());
+  });
+  listEl.addEventListener("input", e => {
+    if (!e.target.matches(".fillrow input")) return;
+    const card = e.target.closest(".qcard");
+    const key = card.dataset.key;
+    const inst = getInstances().find(x => x.key === key); if (!inst) return;
+    state.answers.get(key).text = e.target.value;
+    if (state.instant && e.target.value) state.revealed.add(key);
+    card.querySelector(".qans").hidden = !isShown(inst);
+    paint(card, inst); updateStat(statEl, getInstances());
+  });
+}
+
+const panels = { chapter: $("#panel-chapter"), random: $("#panel-random"), exam: $("#panel-exam") };
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  Object.entries(panels).forEach(([k, p]) => p.hidden = k !== b.dataset.mode);
+}));
+
+/* ---------- 章节练习 ---------- */
+const chSel = $("#ch-chapter");
+BANK.forEach(ch => { const o = el("option", null, ch.name + "（" + ch.questions.length + "题）"); o.value = ch.no; chSel.appendChild(o); });
+const allOpt = el("option", null, "全部章节（" + BANK.reduce((s, c) => s + c.questions.length, 0) + "题）"); allOpt.value = 0; chSel.appendChild(allOpt);
+
+let chBase = [], chInstances = [];
+function rebuildChapters(){
+  const no = +chSel.value;
+  let qs = [];
+  BANK.forEach(ch => { if (!no || ch.no === no) ch.questions.forEach(q => qs.push({ q, ch: ch.name })); });
+  chBase = makeInstances(qs.map(x => x.q), "", $("#ch-shuffleopts").checked);
+  chBase.forEach((inst, i) => inst.chName = qs[i].ch);
+  state.revealed.clear();
+  applyChOrder();
+}
+// 打乱题目顺序：仅在每种题型内部打乱，保持 单选→判断→填空 的块结构（全部章节视图下也不跨章）
+function applyChOrder(){
+  if ($("#ch-shuffle").checked) {
+    const groups = new Map();
+    chBase.forEach(inst => {
+      const k = inst.chName + "|" + inst.q.type;
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(inst);
+    });
+    chInstances = [];
+    groups.forEach(g => chInstances.push(...shuffle(g.slice())));
+  } else {
+    chInstances = chBase.slice();
+  }
+  renderList($("#ch-list"), chInstances, { mode: "chapter" });
+  updateStat($("#ch-stat"), chInstances);
+}
+// 打乱选项顺序：仅重导出各题选项映射，题目顺序与作答不受影响
+function applyChOpts(){
+  const doShuffle = $("#ch-shuffleopts").checked;
+  chBase.forEach(inst => state.optOrder.set(inst.key, deriveOrder(inst.q, doShuffle)));
+  renderList($("#ch-list"), chInstances, { mode: "chapter" });
+  updateStat($("#ch-stat"), chInstances);
+}
+$("#ch-chapter").addEventListener("change", rebuildChapters);
+$("#ch-shuffle").addEventListener("change", applyChOrder);
+$("#ch-shuffleopts").addEventListener("change", applyChOpts);
+$("#ch-instant").addEventListener("change", e => state.instant = e.target.checked);
+$("#ch-showall").addEventListener("click", () => {
+  const show = chInstances.some(x => !isShown(x));
+  chInstances.forEach(x => show ? state.revealed.add(x.key) : state.revealed.delete(x.key));
+  renderList($("#ch-list"), chInstances, { mode: "chapter" }); updateStat($("#ch-stat"), chInstances);
+});
+$("#ch-reset").addEventListener("click", () => { chBase.forEach(x => { state.answers.delete(x.key); state.revealed.delete(x.key); }); rebuildChapters(); });
+bindPanel($("#ch-list"), $("#ch-stat"), () => chInstances, "chapter");
+rebuildChapters();
+
+/* ---------- 随机抽题 ---------- */
+const rdSel = $("#rd-chapter");
+BANK.forEach(ch => { const o = el("option", null, ch.name); o.value = ch.no; rdSel.appendChild(o); });
+const allOpt2 = el("option", null, "全部章节"); allOpt2.value = 0; rdSel.appendChild(allOpt2);
+
+let rdInstances = [];
+function rdDraw(){
+  const no = +rdSel.value;
+  const types = new Set([...document.querySelectorAll(".rd-type:checked")].map(x => +x.value));
+  let pool = [];
+  BANK.forEach(ch => { if (!no || ch.no === no) ch.questions.forEach(q => { if (types.has(q.type)) pool.push(q); }); });
+  if (!pool.length) { alert("所选范围内没有符合条件的题目"); return; }
+  const n = Math.min(+$("#rd-count").value || 10, pool.length);
+  shuffle(pool);
+  let picked = pool.slice(0, n);
+  // 按题型分块排列: 单选→多选→判断→填空（块内保持随机抽中的顺序）
+  const rank = {1: 0, 2: 1, 4: 2, 3: 3};
+  picked.sort((a, b) => rank[a.type] - rank[b.type]);
+  rdInstances = makeInstances(picked, no ? BANK.find(c => c.no === no).name : "混合章节", $("#rd-shuffleopts").checked);
+  state.revealed.clear();
+  renderList($("#rd-list"), rdInstances, { mode: "random" });
+  updateStat($("#rd-stat"), rdInstances);
+}
+$("#rd-go").addEventListener("click", rdDraw);
+// 打乱选项顺序只影响当前已抽出的题，不重新抽题
+$("#rd-shuffleopts").addEventListener("change", () => {
+  const doShuffle = $("#rd-shuffleopts").checked;
+  rdInstances.forEach(inst => state.optOrder.set(inst.key, deriveOrder(inst.q, doShuffle)));
+  renderList($("#rd-list"), rdInstances, { mode: "random" });
+  updateStat($("#rd-stat"), rdInstances);
+});
+$("#rd-instant").addEventListener("change", e => state.instant = e.target.checked);
+$("#rd-showall").addEventListener("click", () => {
+  const show = rdInstances.some(x => !isShown(x));
+  rdInstances.forEach(x => show ? state.revealed.add(x.key) : state.revealed.delete(x.key));
+  renderList($("#rd-list"), rdInstances, { mode: "random" }); updateStat($("#rd-stat"), rdInstances);
+});
+bindPanel($("#rd-list"), $("#rd-stat"), () => rdInstances, "random");
+
+/* ---------- 抽题组卷 ---------- */
+const exCh = $("#ex-chapters");
+BANK.forEach(ch => {
+  const l = el("label", null, '<input type="checkbox" class="ex-ch" value="' + ch.no + '" checked> ' + ch.name.replace("测验", ""));
+  exCh.appendChild(l);
+});
+$("#ex-preset").addEventListener("click", () => { $("#ex-n1").value = 5; $("#ex-n4").value = 5; $("#ex-n3").value = 5; });
+
+let exInstances = [], exTimer = null;
+function exBuild(){
+  const nos = new Set([...document.querySelectorAll(".ex-ch:checked")].map(x => +x.value));
+  const n1 = +$("#ex-n1").value || 0, n4 = +$("#ex-n4").value || 0, n3 = +$("#ex-n3").value || 0;
+  let qs = [];
+  BANK.forEach(ch => {
+    if (!nos.has(ch.no)) return;
+    [1, 4, 3].forEach(t => {
+      const n = t === 1 ? n1 : t === 4 ? n4 : n3;
+      if (!n) return;
+      const pool = shuffle(ch.questions.filter(q => q.type === t).slice());
+      pool.slice(0, n).forEach(q => qs.push({ q, ch: ch.name }));
+    });
+  });
+  if (!qs.length) { alert("请选择章节并设置数量"); return; }
+  // 打乱题目顺序：仅在各章各题型内部打乱，保持 单选→判断→填空 的块结构
+  if ($("#ex-shuffle").checked) {
+    const groups = new Map();
+    qs.forEach(x => {
+      const k = x.ch + "|" + x.q.type;
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(x);
+    });
+    qs = [];
+    groups.forEach(g => qs.push(...shuffle(g.slice())));
+  }
+  exInstances = makeInstances(qs.map(x => x.q), "", $("#ex-shuffleopts").checked);
+  exInstances.forEach((inst, i) => inst.chName = qs[i].ch);
+  state.revealed.clear(); state.examJudged = false;
+  $("#ex-wrap").hidden = false;
+  $("#ex-name").textContent = "模拟卷 · " + exInstances.length + " 题 · " + exInstances.reduce((s, x) => s + x.q.score, 0) + " 分";
+  $("#ex-result").innerHTML = "";
+  $("#ex-submit").hidden = false;
+  renderList($("#ex-list"), exInstances, { mode: "exam" });
+  updateExProgress();
+  clearInterval(exTimer);
+  const t0 = Date.now();
+  exTimer = setInterval(() => {
+    const s = Math.floor((Date.now() - t0) / 1000);
+    $("#ex-timer").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  }, 500);
+}
+function updateExProgress(){
+  const done = exInstances.filter(x => judge(x, state.answers.get(x.key)) !== null).length;
+  $("#ex-progress").textContent = "已答 " + done + " / " + exInstances.length;
+}
+$("#ex-go").addEventListener("click", exBuild);
+bindPanel($("#ex-list"), $("#ex-progress"), () => exInstances, "exam");
+$("#ex-list").addEventListener("click", updateExProgress);
+$("#ex-list").addEventListener("input", updateExProgress);
+$("#ex-submit").addEventListener("click", () => {
+  clearInterval(exTimer);
+  state.examJudged = true;
+  exInstances.forEach(x => state.revealed.add(x.key));
+  renderList($("#ex-list"), exInstances, { mode: "exam" });
+  const g = { 1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0] };
+  let score = 0, total = 0;
+  exInstances.forEach(x => {
+    const j = judge(x, state.answers.get(x.key));
+    g[x.q.type][1]++; if (j === true) { g[x.q.type][0]++; score += x.q.score; }
+    total += x.q.score;
+  });
+  const rows = [1, 2, 3, 4].filter(t => g[t][1]).map(t =>
+    "<span>" + TN[t] + "：<b>" + g[t][0] + "</b>/" + g[t][1] + "</span>").join("");
+  const pct = total ? Math.round(score / total * 100) : 0;
+  $("#ex-result").innerHTML = '<div class="summary"><h3>评分结果</h3><div class="row">' +
+    '<span class="big">' + score + "</span><span>/ " + total + " 分（" + pct + "%）</span></div>" +
+    '<div class="row" style="margin-top:8px">' + rows + "</div>" +
+    '<div class="hint" style="margin-top:6px">用时 ' + $("#ex-timer").textContent + "。正确答案已在题中标绿。</div></div>";
+  $("#ex-result").scrollIntoView({ behavior: "smooth" });
+});
+</script>
+</body>
+</html>
