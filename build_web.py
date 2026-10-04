@@ -11,7 +11,9 @@ import re
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, "data")
-OUT = os.path.join(BASE, "复习资料", "题库练习.html")
+# 输出到仓库根目录 index.html：GitHub Pages 的首页，网址为
+# https://<user>.github.io/icourse163-quiz-practice/
+OUT = os.path.join(BASE, "index.html")
 
 CN_NUM = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
 # 章节内题目顺序: 单选 → 多选 → 判断 → 填空

@@ -3,7 +3,8 @@
 离线单文件的 MOOC 章节小测刷题网页，内置浙江大学《内燃机学》（ZJU-1460864162，第6次开课）10 章小测完整题库 **271 题（含标准答案）**，下载即用、无需联网、无需安装任何依赖。
 
 > [!TIP]
-> 只想刷题？直接下载 [`复习资料/题库练习.html`](复习资料/题库练习.html)，双击用浏览器打开即可（也可拷到手机本地打开）。
+> **在线直接刷题**：<https://emperor6657.github.io/icourse163-quiz-practice/> —— 点开即用，无需下载。
+> 想离线使用？下载 [`index.html`](index.html) 双击打开即可（也可拷到手机本地打开）。
 
 ## 功能
 
@@ -37,7 +38,7 @@
 
 ```
 data/quiz_<测验ID>.json   每章原始题目数据（题型/分值/题干/选项/答案/解析）
-build_web.py              py build_web.py   → 生成 复习资料/题库练习.html（网页）
+build_web.py              py build_web.py   → 生成 index.html（练习网页，即 GitHub Pages 首页）
 gen_review.py             py gen_review.py  → 生成 Word/Markdown 复习资料（零依赖）
 ```
 
